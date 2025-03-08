@@ -11,7 +11,41 @@ su
 cd ~ && python3 -m venv ocvenv && source ocvenv/bin/activate && pip install pynvml nvidia-ml-py
 ```
 
-Put the content of `NvOverclock.desktop` in `~/.config/autostart/NvOverclock.desktop`.
+## Setting Up the Systemd Service
+
+To ensure the overclocking script runs automatically on startup, create a systemd service file:
+
+```sh
+sudo nano /etc/systemd/system/nvgpu-overclock.service
+```
+
+Add the following content:
+
+```ini
+[Unit]
+Description=NVIDIA GPU Overclocking Service
+After=multi-user.target nvidia-persistenced.service
+Requires=nvidia-persistenced.service
+
+[Service]
+Type=oneshot
+ExecStart=/bin/bash -c "sleep 15 && /root/nvgpu-overclock/run-nvgpu-overclock"
+RemainAfterExit=true
+User=root
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Save the file and reload systemd:
+
+```sh
+sudo systemctl daemon-reload
+sudo systemctl enable nvgpu-overclock.service
+sudo systemctl start nvgpu-overclock.service
+```
+
+This will ensure the overclocking script is applied at boot.
 
 ## Expected Folder Structure
 
