@@ -8,6 +8,12 @@ This script must be created as the root account, as it needs a root Python virtu
 
 ```sh
 su
+cd ~
+git clone https://github.com/cycloarcane/Nvidia-wayland-overclocking.git
+mv Nvidia-wayland-overclocking/ nvgpu-overclock/
+cd nvgpu-overclock
+chmod +x overclock.py
+chmod +x run-nvgpu-overclock
 cd ~ && python3 -m venv ocvenv && source ocvenv/bin/activate && pip install pynvml nvidia-ml-py
 ```
 
