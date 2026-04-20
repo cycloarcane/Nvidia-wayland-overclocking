@@ -1,2 +1,0 @@
-#!/usr/bin/bash
-bash -c 'source /root/ocvenv/bin/activate && python3 /root/nvgpu-overclock/overclock.py'

@@ -1,72 +1,37 @@
 # Nvidia-wayland-overclocking
 
-I found that my 3090's core clock was being throttled to 210MHz due to a possible hardware issue that caused the GPU to detect phantom power draw of 150W. I suspect a faulty shunt resistor. Manually overclocking it using these scripts seems to have permanently fixed the issue.  
+My 3090's core clock was being throttled to 210MHz due to a possible hardware issue that caused the GPU to detect phantom power draw of 150W. I suspect a faulty shunt resistor. Manually setting the power limit and clock offsets using this script fixed the issue.
 
-## Installation
-
-This script must be created as the root account, as it needs a root Python virtual environment.
+## Dependencies
 
 ```sh
-su
-cd ~
-git clone https://github.com/cycloarcane/Nvidia-wayland-overclocking.git
-mv Nvidia-wayland-overclocking/ nvgpu-overclock/
-cd nvgpu-overclock
-chmod +x overclock.py
-chmod +x run-nvgpu-overclock
-cd ~ && python3 -m venv ocvenv && source ocvenv/bin/activate && pip install pynvml nvidia-ml-py
+sudo pacman -S python-nvidia-ml-py
 ```
 
-## Setting Up the Systemd Service
+Required for core/memory clock offsets (no `nvidia-smi` equivalent on Wayland).
 
-To ensure the overclocking script runs automatically on startup, create a systemd service file:
+## Usage
 
 ```sh
-sudo nano /etc/systemd/system/nvgpu-overclock.service
+sudo ./nvgpu-overclock.sh
 ```
 
-Add the following content:
+The interactive script will:
+1. Let you choose a preset or enter custom overclock values
+2. Apply the overclock
+3. Optionally install a systemd service to apply it automatically on boot
 
-```ini
-[Unit]
-Description=NVIDIA GPU Overclocking Service
-After=multi-user.target nvidia-persistenced.service
-Requires=nvidia-persistenced.service
+### Presets
 
-[Service]
-Type=oneshot
-ExecStart=/bin/bash -c "sleep 15 && /root/nvgpu-overclock/run-nvgpu-overclock"
-RemainAfterExit=true
-User=root
+| Preset | Power | Core | Memory (GWE) |
+|---|---|---|---|
+| Power only | 400W | - | - |
+| Conservative | 390W | +50 MHz | +200 MHz |
+| Moderate | 400W | +80 MHz | +300 MHz |
+| Aggressive | 400W | +105 MHz | +400 MHz |
 
-[Install]
-WantedBy=multi-user.target
-```
-
-Save the file and reload systemd:
-
-```sh
-sudo systemctl daemon-reload
-sudo systemctl enable nvgpu-overclock.service
-sudo systemctl start nvgpu-overclock.service
-```
-
-This will ensure the overclocking script is applied at boot.
-
-## Expected Folder Structure
-
-```
-.
-├── nvgpu-overclock
-│   ├── overclock.py
-│   └── run-nvgpu-overclock
-└── ocvenv
-```
-
-- `nvgpu-overclock/`: Contains the main overclocking script and the run script.
-- `ocvenv/`: Python virtual environment (contents not expanded for brevity).
+All values are clamped to safe limits (core 0-150 MHz, memory 0-500 MHz GWE, power 200-400W).
 
 ## Credit
 
 **Credit to [this](https://forums.developer.nvidia.com/t/nvidia-gpu-overclocking-under-wayland-guide/290381) post.**
-

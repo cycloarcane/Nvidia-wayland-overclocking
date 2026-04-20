@@ -1,5 +1,0 @@
-[Desktop Entry]
-Name=NvOverclock
-Exec=/usr/bin/sudo /root/nvgpu-overclock/run-nvgpu-overclock
-Terminal=false
-Type=Application

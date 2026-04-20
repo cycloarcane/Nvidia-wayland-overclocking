@@ -1,0 +1,13 @@
+[Unit]
+Description=NVIDIA GPU Overclocking Service
+After=nvidia-persistenced.service
+Requires=nvidia-persistenced.service
+
+[Service]
+Type=oneshot
+ExecStartPre=/bin/sleep 15
+ExecStart=/home/r/Documents/Nvidia-wayland-overclocking/nvgpu-overclock.sh --apply
+RemainAfterExit=true
+
+[Install]
+WantedBy=multi-user.target
